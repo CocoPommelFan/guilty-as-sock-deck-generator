@@ -79,12 +79,14 @@ def deckCreate():
 
 
 def newFile(_name): 
+    Path("decks").mkdir(parents=True, exist_ok=True)
     with open(f"{path}{_name}.json", "w", encoding="utf-8") as file:
         json.dump(default_data(f"{path}{_name}"), file, ensure_ascii=False, indent=4)
     return
      
 
 def addToFile(_, _name):
+    Path("decks").mkdir(parents=True, exist_ok=True)
     with open(f"{path}{_name}.json", "w", encoding="utf-8") as file:
         json.dump(_, file, ensure_ascii=False, indent=4)
     toTxt(_name)
