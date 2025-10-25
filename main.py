@@ -2,6 +2,10 @@ import glob
 import json
 import os
 from pathlib import Path
+import keyboard
+
+
+
 
 path = "decks\\"
 
@@ -30,7 +34,6 @@ def start():
                     continue
                 console_clear()
                 cycle(deck_name)
-                return
             case "2":
                 deck_name = checkExistsDecks()
                 if deck_name == True:
@@ -111,17 +114,90 @@ def ifExit(x, deck_data, deck_name):
         return True
     return False
 
+def enterH(max_chars, deck_data, deck_name):
+    try:
+        _max_chars = max_chars
+        print(f"Введите заголовок (осталось 42 символов):")
+        text = ""
+
+        def on_key(event):
+            
+            nonlocal text, _max_chars
+            
+            if event.event_type == keyboard.KEY_DOWN:
+                if event.name == 'enter':
+                    return False
+                elif event.name == 'esc':
+                    return None
+                elif event.name == "space":
+                    if _max_chars > 0:
+                        text += ' '
+                        _max_chars -= 1
+                elif event.name == 'backspace':
+                    if text:
+                        text = text[:-1]
+                        _max_chars += 1
+                elif len(event.name) == 1 and _max_chars > 0:
+                    text += event.name
+                    _max_chars -= 1
+            console_clear()
+            print(f"\rВведите заголовок (осталось {_max_chars} символов):", flush=True)
+            print(text)
+            
+        keyboard.on_press(on_key)
+        keyboard.wait('enter')
+        return text
+    except KeyboardInterrupt:
+        print("Сохранение колоды...")
+        addToFile(deck_data, deck_name)
+        console_clear()
+        print("Колода сохранена")
+        return True
+        
+
+def enterD(max_chars, deck_data, deck_name):
+    try:
+        _max_chars = max_chars
+        print(f"Введите описание (осталось 60 символов):")
+        text = ""
+
+        def on_key2(event):    
+            nonlocal text, _max_chars
+            
+            if event.event_type == keyboard.KEY_DOWN:
+                if event.name == 'enter':
+                    return False
+                elif event.name == 'esc':
+                    return None
+                elif event.name == 'backspace':
+                    if text:
+                        text = text[:-1]
+                        _max_chars += 1
+                elif len(event.name) == 1 and _max_chars > 0:
+                    text += event.name
+                    _max_chars -= 1
+            console_clear()
+            print(f"\rВведите описание (осталось {_max_chars} символов):", flush=True)
+            print(text)
+            
+        keyboard.on_press(on_key2)
+        keyboard.wait('enter')
+        return text
+    except KeyboardInterrupt:
+        print("Сохранение колоды...")
+        addToFile(deck_data, deck_name)
+        console_clear()
+        print("Колода сохранена")
+        return True
 
 def question(deck_data, deck_name):
-    print("Введите заголовок:")
-    h = input()
-    if ifExit(h, deck_data, deck_name):
-        return (True, True)
-    print("Введите Описание:")
-    d = input()
-    if ifExit(d, deck_data, deck_name):
-        return (True, True)
-    
+    h, d = False, False
+    h = enterH(42, deck_data, deck_name)
+    if h is True:
+        return (h, d)
+    d = enterD(60, deck_data, deck_name)
+    if d is True:
+        return (h, d)
     console_clear()
     return (h, d)
 
